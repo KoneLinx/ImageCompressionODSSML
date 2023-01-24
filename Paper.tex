@@ -208,7 +208,7 @@ T = (size * ratio) / speed + latency
 \label{networkfun}
 \end{equation}
 
-Where $size$ is the total size of the request, $ratio$ is the achieved compression ratio, $speed$ is the network carriage capacity over a set frame in time and  $latency$ is introduced by the decompression algorithm by performing the decompression. Here it can also be reasonably assumed that the latency is in constant relationship to the size on the same device with the same data. More about this at \ref{complexityassumption}.
+Where $size$ is the total size of the request, $ratio$ is the achieved compression ratio, $speed$ is the network carriage capacity over a set frame in time and  $latency$ is introduced by the decompression algorithm by performing the decompression. Here it can also be reasonably assumed that the latency is in constant relationship to the size on the same device with the same data. More about this at \ref{complexityasumption}.
 
 The most variable constant in our equation will be the client network carriage capacity. Assuming the decompression time is more or less constant is relation to the size, the following two scenarios can be analised.
 
@@ -222,7 +222,7 @@ T_1 = (size_0 * ratio) / speed + latency
 
 Where $ratio$ is the compression ratio achieved. $T_0$ is the time it takes without compression, $T_1$ shows the time with compression. Taking a skeptical compression ratio of 90\% and the have the latency be about about 10e7-th of the size in bytes in seconds. Given 1MB, this equates a reduced size of 900KB and an additional latency of 100ms, the curve in figure~\ref{fig:CurveNetworkLimitationSpeed} can be derived if by taking $T_1$ over $T_0$. This puts $T_1$'s performance in relation to the default compression-less $T_0$.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
     \centering
 \begin{tikzpicture}[scale = 2, domain = -0.001:6]
 \draw[->] (0,0) -- (6,0) node[right] {$KB/s$};
@@ -258,7 +258,7 @@ T_2 = (size_0 * ratio_2) / speed + latency_2
 
 Plotting the curve in figure~\ref{fig:CurveNetworkLimitationSpeedTwo}. the compression ratio in example 1 is 80\% and 60\% in example 2. The latency in example 2 is twice the latency of 1; 100ms and 200ms respectively. The size of the original file is 1MB. 
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
     \centering
 \begin{tikzpicture}[scale = 2, domain = -0.001:6]
 \draw[->] (0,0) -- (6,0) node[right] {$KB/s$};
@@ -278,7 +278,7 @@ speed < size * (ratio_1 - ratio_2) / (latency_2 - latency_1)
 
 This is logical as when $T_1$ is substituted to be that of no compression, I.e. $T_0$, it reduces to formula \ref{networkspeedmin} again. The tipping point varies based on the difference in compression ratio and latency as expected. A better compression ratio and a lower latency also positively impact the performance compared to the other. However, it also in relation to the total size. For a larger file, a better compression ratio can beat a faster algorithm. 
 
-\subsection{Time complexity}
+\subsection{Time complexity\label{complexitysection}}
 
 Up until now, the size and latency has been assumed to be constant. While true for a specific image, the values might differ greatly amongst them. First of all, the initial size of the image may determine the total amount of latency added. Secondly, the contents or complexity of the image may also have an effect on latency.
 
@@ -357,6 +357,12 @@ I.e. if function 1 has a weaker slope than function 2, the function is the small
 
 Whether any of the simplified equations can be used to present predictions within margin remains to be seen. It is required to run several tests to measure both basic performance as well as complexity and slope.
 
+\subsubsection{Assumptions\label{complexityasumption}}
+
+Because complexity graphs add a ton of complexity to the formulas presented above, it will be assumed that the algorithms tested have a linear complexity graph. This can be assumed to a reasonable extent because if an algorithm were to present a complexity greater than that, it would decay in performance rather quickly and not perform well in this case study. Where an algorithm would present a complexity lower than a linear one, it will most likely outright win everything. This is because images are very large and that would cause any such non linear function to quickly dip below it. Therefore it would always end up below the rest.
+
+Whether these assumptions are true has yet to be determined by the complexity graph of the algorithm with the best performance. If it present a non-linear graph this assumption cannot be taken. However, if it does present a linear graph it does not prove this assumption to be valid either.
+
 \subsection{Streaming algorithms}
 
 Streaming algorithms, as opposed to non-streaming algorithms, can process sequenced information from start to finish in a few passes, typically just one, with either no or minimal arbitrary lookup \cite{streamalg}. A sliding window also largely counts as single pass. Such algorithms can start their operation even before all data is available. In \ref{effectnetwork} latency has been discussed, after the calculation of the download time a fixed latency was applied. This assumes the full response is required before the algorithm can be run. What streaming algorithms change in this regard is that they are already processing the data during the download. In the best case scenario this reduces the latency to a fraction of their otherwise significant value. Whereas in the worst cases, such as the download being faster than the algorithm itself, it does not change anything. This means that a streaming algorithm has a major advantage over non-streaming algorithms.
@@ -379,7 +385,7 @@ System resources will also affect the performance of each algorithm. While its e
 
 %\subsubsection{Canvas API}
 
-%\begin{figure}[h!]
+%\begin{figure}[ht!]
 %\centering
 %\includegraphics[width=0.8\textwidth]{CurveJSCanvasLimitation.png}
 %\caption{
@@ -493,45 +499,45 @@ Where \verb|E| is the effort level, depends on the executable. Generally ranging
 
 The 7-zip compression tool: A versatile tool implementing many common compression algorithms \cite{7zip}.
 
-\subsubsection{Lossy}
-
-Compressors developed for images, hoping to improve by discarding detail.
-
-\begin{lstlisting}[language = bash]
-
-    # JpegXL
-    cjxl -q Q -e E
-    djxl
-
-    # AVIF
-    # Only accepts .png
-    avifenc -q Q -s (10 - E)
-    # Only outputs .png
-    avifdec --png-compress 0
-
-    # WebP
-    # Only accepts .bmp
-    cwebp -q Q -m E
-    # Does output .ppm
-    dwebp -ppm
-
-    # Webp2
-    cwp2 -q Q -effort E
-    dwp2 -ppm
-
-    # Jpeg
-    cjpeg -quality Q -optimize
-    djpeg
-
-    # MozJpeg
-    cjpeg-static -quality Q -optimize
-    djpeg-static
-
-\end{lstlisting}
-
-Where \verb|E| is the effort level, depends on the executable. Generally ranging from 0 to 10. \verb|Q| is the quality level, depends on the executable. Generally ranging from 0 to 100.
-
-JXL reference implementation \cite{jxl}. AVIF reference implementation \cite{avif}. WebP reference implementation \cite{webp}. WebP2 reference implementation \cite{webp2}. Jpeg-Turbo \cite{jpegturbo}. Mozjpeg \cite{mozjpeg}.
+%\subsubsection{Lossy}
+%
+%Compressors developed for images, hoping to improve by discarding detail.
+%
+%\begin{lstlisting}[language = bash]
+%
+%    # JpegXL
+%    cjxl -q Q -e E
+%    djxl
+%
+%    # AVIF
+%    # Only accepts .png
+%    avifenc -q Q -s (10 - E)
+%    # Only outputs .png
+%    avifdec --png-compress 0
+%
+%    # WebP
+%    # Only accepts .bmp
+%    cwebp -q Q -m E
+%    # Does output .ppm
+%    dwebp -ppm
+%
+%    # Webp2
+%    cwp2 -q Q -effort E
+%    dwp2 -ppm
+%
+%    # Jpeg
+%    cjpeg -quality Q -optimize
+%    djpeg
+%
+%    # MozJpeg
+%    cjpeg-static -quality Q -optimize
+%    djpeg-static
+%
+%\end{lstlisting}
+%
+%Where \verb|E| is the effort level, depends on the executable. Generally ranging from 0 to 10. \verb|Q| is %the quality level, depends on the executable. Generally ranging from 0 to 100.
+%
+%JXL reference implementation \cite{jxl}. AVIF reference implementation \cite{avif}. WebP reference %implementation \cite{webp}. WebP2 reference implementation \cite{webp2}. Jpeg-Turbo \cite{jpegturbo}. %Mozjpeg \cite{mozjpeg}.
 
 \subsection{Benchmark}
 
@@ -580,11 +586,11 @@ Notably one of the tested executables, Kvick, presented quite a few. For a large
 
 \subsection{Complexity}
 
-As described in \ref{complexitysection}, a complexity function can be estimated from the data collected from \ref{mediumgrandtest}. As described in \ref{complexityassumption} this is a linear function. By calculating a linear approximation of the source image size plotted to decompression time $factor$, $base$, and $error$ as described by formula \ref{complexityfun} can be derived.
+As described in \ref{complexitysection}, a complexity function can be estimated from the data collected from \ref{mediumgrandtest}. As described in \ref{complexityasumption} this is a linear function. By calculating a linear approximation of the source image size plotted to decompression time $factor$, $base$, and $error$ as described by formula \ref{complexityfun} can be derived.
 
-A distribution of measured performance and complexity graph estimation for each algorithm included in the test can be found at \ref{app:complexitygraphs}. Two unique graphs are shown in figure~\ref{fig:ograph}.
+A distribution of measured performance and complexity graph estimation for each algorithm included in the test can be found at \ref{app:models}. Two unique graphs are shown in figure~\ref{fig:oPlot}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{OPNG.png}
 \includegraphics[width=0.475\textwidth]{OPPMD.png}
@@ -626,7 +632,7 @@ Given a network speed of 650 KB/s, figure~\ref{fig:cNetwork-vSize-Ratio} shows t
 
 The model put forward in figure~\ref{fig:cNetwork-vSize-Ratio} is theoretical. The benchmark that has been conducted can also be plotted to the same graph. The measurement from a few algorithms are plotted in the following graph.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.8\textwidth]{cNetwork-vSize-Ratio-Real.png}
 \caption{\label{fig:cNetwork-vSize-Ratio-Real} Real measurements}
@@ -693,9 +699,9 @@ The model put forward in \ref{analysis} were able to show interesting data. Howe
 
 \section{Real data}
 
-A fair amount of testing data has been used to form the chart in figure~\ref{fig:Real}. From this graph we can see that WebP consistently performs well, together with the formats Flic and Kvick. Although Kvick had an error rate that was rather high this result cannot be taken as any conclusion. WebP 2 also performed well, falling just behind that of WebP. Since this format is still experimental this is all that can be said about it. Compression times were rather high for both WebP end WebP 2.
+A fair amount of testing data has been used to form the chart in figure~\ref{fig:Real}. This graph shows that WebP consistently performs well, together with the formats Flic and Kvick. Although Kvick had an error rate that was rather high this result cannot be taken as any conclusion. WebP 2 also performed well, falling just behind that of WebP. Since this format is still experimental this is all that can be said about it. Compression times were rather high for both WebP end WebP 2.
 
-After the strong performers we find Jpeg XL. When also accounting for effort as shown in figure~\ref{fig:vEffortReal}, Jpeg XL managed to become a strong competitor. In this whole study the winner in absolute terms. But as shown in figure~\ref{fig:vEffortCompression}, the compression time needed to achieve this performance is rather costly compared the the other options available.
+Jpeg XL can be found after the strong performers. When also accounting for effort as shown in figure~\ref{fig:vEffortReal}, Jpeg XL managed to become a strong competitor. In this whole study the winner in absolute terms. But as shown in figure~\ref{fig:vEffortCompression}, the compression time needed to achieve this performance is rather costly compared the the other options available.
 
 The first general compression algorithm presents itself after Jpeg XL. PNG roughly shows the same performance as it implements a general compression algorithms as well, this result was to be expected.
 
@@ -716,6 +722,9 @@ Poskanzer, J., Henderson, B. (2021). Netbpm. \textit{https://netpbm.sourceforge.
 
 \bibitem[Leonard. 2016]{bmp}
 Leonard, S. (2016). Windows Image Media Types. RFC 7903. \textit{10.17487/RFC7903}
+
+\bibitem[CompuServe inc. 1987]{gif}
+CompuServe inc. (1987). GIF (tm), Graphics Interchange Format. \textit{https://www.w3.org/Graphics/GIF/spec-gif87.txt}
 
 \bibitem[Han et al. 2021]{av1spec}
 Han, J., Li, B., Mukherjee, D., Chiang, C., Grange, A., Chen, C., Su, H., Parker, S., Deng, S., Joshi, U., Chen, Y., Wang, Y., Wilkins, P., Xu, Y. \& Bankoski, J. (2021). A Technical Overview of AV1. \textit{10.1109/JPROC.2021.3058584} 
@@ -814,93 +823,93 @@ Image compression: On-demand systems seeking minimal latency.
 
 \chapter{Complexity graphs\label{app:ographs}}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{OAVIF.png}
 \includegraphics[width=0.475\textwidth]{OBZIP2.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{ODEFLATE.png}
 \includegraphics[width=0.475\textwidth]{OFLIC.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{OGZIP.png}
 \includegraphics[width=0.475\textwidth]{OJXL.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{OKVICK.png}
 \includegraphics[width=0.475\textwidth]{OLZMA2.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{OPNG.png}
 \includegraphics[width=0.475\textwidth]{OPPMD.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{OQIC.png}
 \includegraphics[width=0.475\textwidth]{OQLIC.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{OQLIC2.png}
 \includegraphics[width=0.475\textwidth]{OWEBP.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.475\textwidth]{OWP2.png}
 \end{figure}
 
 \chapter{Models\label{app:models}}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\textwidth]{cSize-vNetwork-Ratio.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\textwidth]{cNetwork-vSize-Ratio.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=0.8\textwidth]{cNetwork-vSize-Ratio-Real.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\textwidth]{cSize-vNetwork-Ratio-Effort.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\textwidth]{cNetwork-vSize-Ratio-Effort.png}
 \end{figure}
 
 \chapter{Ranking\label{app:ranks}}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\textwidth]{Ratio-Real.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\textwidth]{Ratio-Real-Common.png}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\textwidth]{Ratio-Real-Common-Effort.png}
 \end{figure}
