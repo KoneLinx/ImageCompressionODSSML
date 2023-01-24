@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body { width: 100vw; height: 100vh; background-color: black; color: white; padding: 0; margin: 0;}
+            div { width: 22%; margin: 2%; padding: 2%; border: 2px grey solid; display: inline-block; }
+            img { width: 100%; margin: 0; }
+        </style>
+    </head>
+    <body>
+        <div>
+            <span>WebP</span>
+            <img id="webp" src="tls.webp"/>
+            <script>document.getElementById("webp").addEventListener("load", () => console.log("Loaded: WebP"))</script>
+        </div>
+        <div>
+            <span>AVIF</span>
+            <img id="avif" src="tls.avif"/>
+            <script>document.getElementById("avif").addEventListener("load", () => console.log("Loaded: AVIF"))</script>
+        </div>
+        <div>
+            <span>PNG</span>
+            <img id="png" src="tls.png"/>
+            <script>document.getElementById("png").addEventListener("load", () => console.log("Loaded: PNG"))</script>
+        </div>
+        <div>
+            <span>BMP</span>
+            <img id="bmp" src="tls.bmp"/>
+            <script>document.getElementById("bmp").addEventListener("load", () => console.log("Loaded: BMP"))</script>
+        </div>
+        <div>
+            <span>Jpeg XL</span>
+            <img id="jxl" src="tls.jxl"/>
+            <script>document.getElementById("jxl").addEventListener("load", () => console.log("Loaded: Jpeg XL"))</script>
+        </div>
+        <div>
+            <span>WebP 2</span>
+            <img id="wp2" src="tls.wp2"/>
+            <script>document.getElementById("wp2").addEventListener("load", () => console.log("Loaded: WebP 2"))</script>
+        </div>
+    </body>
+</html>
